@@ -4,8 +4,8 @@ The main point I wanted to achieve through this project is to successfully creat
 This extends to understanding about concurrency in Go.
 
 In this project, I will be implementing some key features from Go, such as:
-* [Goroutines]()
-* [Channels]()
+* [Goroutines](https://tour.golang.org/concurrency/1)
+* [Channels](https://tour.golang.org/concurrency/2)
 
 ## Built With
 

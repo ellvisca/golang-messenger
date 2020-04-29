@@ -77,3 +77,11 @@ func Login(username, password string) map[string]interface{} {
 	resp["data"] = client
 	return resp
 }
+
+// Client send message
+func (client *Client) SendMsg(userId primitive.ObjectID, text string) *Message {
+	message := &Message{}
+	message.Client = userId
+	message.Text = text
+	return message
+}
