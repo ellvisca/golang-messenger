@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/ellvisca/messenger/app"
 	"github.com/ellvisca/messenger/controllers"
 	"github.com/gorilla/mux"
 	"github.com/maple-ai/syrup"
@@ -13,11 +14,18 @@ import (
 func main() {
 	router := syrup.New(mux.NewRouter())
 
-	// User router
-	router.Post("/api/v1/user", controllers.CreateClient)
+	// Client router
+	router.Post("/api/v1/client", controllers.CreateClient)
 
 	// Login router
-	router.Post("/api/v1/user/login", controllers.ClientLogin)
+	router.Post("/api/v1/client/login", controllers.ClientLogin)
+
+	// Hub router
+	router.Post("/api/v1/hub", controllers.CreateHub)
+	router.Post("/api/v1/hub/message", controllers.RunHub)
+
+	// Middleware
+	router.Use(app.JwtAuthentication)
 
 	port := os.Getenv("PORT")
 	if port == "" {
