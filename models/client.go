@@ -78,10 +78,12 @@ func Login(username, password string) map[string]interface{} {
 	return resp
 }
 
-// Client send message
-func (client *Client) SendMsg(userId primitive.ObjectID, text string) *Message {
+// Client sent message
+func (client *Client) SendMsg(userId primitive.ObjectID, text string, msgs chan<- *Message) {
 	message := &Message{}
 	message.Client = userId
 	message.Text = text
-	return message
+	if message.Text != "" {
+		msgs <- message
+	}
 }

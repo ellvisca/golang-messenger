@@ -22,7 +22,7 @@ func main() {
 
 	// Hub router
 	router.Post("/api/v1/hub", controllers.CreateHub)
-	router.Post("/api/v1/hub/message", controllers.RunHub)
+	router.Post("/api/v1/hub/message", controllers.ReceiveMsg)
 
 	// Middleware
 	router.Use(app.JwtAuthentication)

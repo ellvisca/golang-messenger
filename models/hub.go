@@ -38,7 +38,7 @@ func (hub *Hub) Create(clientId, targetId primitive.ObjectID) map[string]interfa
 	return resp
 }
 
-func (hub *Hub) UpdateMessage(hubId primitive.ObjectID, message *Message) {
+func (hub *Hub) UpdateMsgs(hubId primitive.ObjectID, message *Message) {
 	collection := GetDB().Collection("hubs")
 	filter := bson.M{"_id": hubId}
 
@@ -52,7 +52,7 @@ func (hub *Hub) UpdateMessage(hubId primitive.ObjectID, message *Message) {
 	collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&hub)
 }
 
-func (hub *Hub) ViewMessage(hubId primitive.ObjectID) map[string]interface{} {
+func (hub *Hub) ViewMsgs(hubId primitive.ObjectID) map[string]interface{} {
 	collection := GetDB().Collection("hubs")
 	filter := bson.M{"_id": hubId}
 	collection.FindOne(context.TODO(), filter).Decode(&hub)
