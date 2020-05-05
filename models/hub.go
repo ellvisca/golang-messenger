@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Kamva/mgm"
 	u "github.com/ellvisca/messenger/utils"
@@ -10,9 +11,9 @@ import (
 )
 
 type Hub struct {
-	mgm.DefaultModel
-	Participant []primitive.ObjectID `json:"participants"`
-	Messages    []*Message           `json:"messages"`
+	mgm.DefaultModel `bson:",inline"`
+	Participant      []primitive.ObjectID `json:"participants"`
+	Messages         []*Message           `json:"messages"`
 }
 
 type Message struct {
@@ -20,6 +21,7 @@ type Message struct {
 	Client primitive.ObjectID `json:"client"`
 }
 
+// Create new hub
 func (hub *Hub) Create(clientId, targetId primitive.ObjectID) map[string]interface{} {
 	collection := GetDB().Collection("hubs")
 	hub.Participant = append(hub.Participant, clientId)
@@ -30,14 +32,17 @@ func (hub *Hub) Create(clientId, targetId primitive.ObjectID) map[string]interfa
 		return u.Message(false, "Connection error, please try again")
 	}
 	id := doc.InsertedID.(primitive.ObjectID)
+	fmt.Println(id)
 
 	// Response
 	filter := bson.M{"_id": id}
 	collection.FindOne(context.TODO(), filter).Decode(&hub)
 	resp := u.Message(true, "Successfully created hub")
+	resp["data"] = hub
 	return resp
 }
 
+// Update messages array on hub
 func (hub *Hub) UpdateMsgs(hubId primitive.ObjectID, message *Message) {
 	collection := GetDB().Collection("hubs")
 	filter := bson.M{"_id": hubId}
@@ -52,6 +57,7 @@ func (hub *Hub) UpdateMsgs(hubId primitive.ObjectID, message *Message) {
 	collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&hub)
 }
 
+// view messages on hub
 func (hub *Hub) ViewMsgs(hubId primitive.ObjectID) map[string]interface{} {
 	collection := GetDB().Collection("hubs")
 	filter := bson.M{"_id": hubId}

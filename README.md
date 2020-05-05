@@ -28,3 +28,7 @@ In this project, I will be implementing some key features from Go, such as:
 ## Acknowledgements
 
 * Special thanks to Sung Park as author's mentor - [sungjwpark](https://github.com/sungwjpark)
+
+## References
+### These are the list of references I used while I was trying to work on this project
+* [Go by Example](https://gobyexample.com/) - especially on goroutines and channel parts
