@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/ellvisca/messenger/models"
 	u "github.com/ellvisca/messenger/utils"
@@ -19,19 +21,31 @@ var CreateHub = func(w http.ResponseWriter, r *http.Request) {
 	u.Respond(w, resp)
 }
 
-var RunHub = func(w http.ResponseWriter, r *http.Request) {
+var ReceiveMsg = func(w http.ResponseWriter, r *http.Request) {
 	client := &models.Client{}
 	hub := &models.Hub{}
 	message := &models.Message{}
 	json.NewDecoder(r.Body).Decode(message)
 
 	userId := r.Context().Value("client").(primitive.ObjectID)
-	message = client.SendMsg(userId, message.Text)
-
 	keys := r.URL.Query()["hubId"]
 	hubId, _ := primitive.ObjectIDFromHex(keys[0])
 
-	hub.UpdateMessage(hubId, message)
-	resp := hub.ViewMessage(hubId)
-	u.Respond(w, resp)
+	clientMsgs := make(chan *models.Message, 1)
+
+	go client.SendMsg(userId, message.Text, clientMsgs)
+	time.Sleep(time.Microsecond)
+
+	select {
+	case messages := <-clientMsgs:
+		fmt.Println("Message", messages)
+		hub.UpdateMsgs(hubId, messages)
+		resp := hub.ViewMsgs(hubId)
+		u.Respond(w, resp)
+		return
+	default:
+		resp := hub.ViewMsgs(hubId)
+		u.Respond(w, resp)
+		return
+	}
 }
