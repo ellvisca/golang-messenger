@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -22,23 +21,25 @@ var CreateHub = func(w http.ResponseWriter, r *http.Request) {
 }
 
 var ReceiveMsg = func(w http.ResponseWriter, r *http.Request) {
+	// Model pointers
 	client := &models.Client{}
 	hub := &models.Hub{}
 	message := &models.Message{}
+
+	// Message decoding
 	json.NewDecoder(r.Body).Decode(message)
 
+	// User and hub ID
 	userId := r.Context().Value("client").(primitive.ObjectID)
 	keys := r.URL.Query()["hubId"]
 	hubId, _ := primitive.ObjectIDFromHex(keys[0])
 
 	clientMsgs := make(chan *models.Message, 1)
-
 	go client.SendMsg(userId, message.Text, clientMsgs)
 	time.Sleep(time.Microsecond)
 
 	select {
 	case messages := <-clientMsgs:
-		fmt.Println("Message", messages)
 		hub.UpdateMsgs(hubId, messages)
 		resp := hub.ViewMsgs(hubId)
 		u.Respond(w, resp)
