@@ -21,16 +21,30 @@ type Message struct {
 	Client primitive.ObjectID `json:"client"`
 }
 
-// Create new hub
-func (hub *Hub) Create(clientId, targetId primitive.ObjectID) map[string]interface{} {
+//Validate incoming create request
+func (hub *Hub) Validate(clientId, targetId primitive.ObjectID) (map[string]interface{}, bool) {
 	collection := GetDB().Collection("hubs")
 
+	// Check hub with given participants
 	participants := []primitive.ObjectID{clientId, targetId}
 	query := bson.M{"participant": participants}
 	err := collection.FindOne(context.TODO(), query).Decode(&hub)
 	if err == nil {
 		resp := u.Message(false, "Hub already exists")
 		resp["data"] = hub
+		return resp, false
+	}
+
+	// Valid response
+	return u.Message(false, "Requirement passed"), true
+}
+
+// Create new hub
+func (hub *Hub) Create(clientId, targetId primitive.ObjectID) map[string]interface{} {
+	collection := GetDB().Collection("hubs")
+
+	// Validation
+	if resp, ok := hub.Validate(clientId, targetId); !ok {
 		return resp
 	}
 

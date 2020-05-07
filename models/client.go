@@ -25,9 +25,37 @@ type Token struct {
 	jwt.StandardClaims
 }
 
+// Validate incoming register request
+func (client *Client) Validate() (map[string]interface{}, bool) {
+	// Check for duplicate username
+	collection := GetDB().Collection("clients")
+	filter := bson.M{"username": client.Username}
+	err := collection.FindOne(context.TODO(), filter).Decode(&client)
+	if err == nil {
+		return u.Message(false, "Username already taken"), false
+	}
+
+	// Check for password length
+	if len(client.Password) < 6 {
+		return u.Message(false, "Password needs to be at least 6 characters"), false
+	}
+
+	// Valid response
+	return u.Message(false, "Requirement passed"), true
+}
+
 // Create new client
 func (client *Client) Create() map[string]interface{} {
 	collection := GetDB().Collection("clients")
+
+	// Validation
+	if resp, ok := client.Validate(); !ok {
+		return resp
+	}
+
+	// Hash password
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(client.Password), bcrypt.DefaultCost)
+	client.Password = string(hashedPassword)
 
 	// Create user attempt
 	doc, err := collection.InsertOne(context.TODO(), client)
@@ -55,14 +83,16 @@ func Login(username, password string) map[string]interface{} {
 	err := collection.FindOne(context.TODO(), filter).Decode(&client)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return u.Message(false, "Email address not found")
+			return u.Message(false, "Username not found")
 		}
 		return u.Message(false, "Connection error, please try again")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(client.Password), []byte(password))
-	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return u.Message(false, "Invalid login credentials")
+	if err != nil {
+		if err == bcrypt.ErrMismatchedHashAndPassword {
+			return u.Message(false, "Invalid login credentials")
+		}
 	}
 
 	// Token
