@@ -2,7 +2,6 @@ package models
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Kamva/mgm"
 	u "github.com/ellvisca/messenger/utils"
@@ -29,7 +28,6 @@ func (hub *Hub) Create(clientId, targetId primitive.ObjectID) map[string]interfa
 	participants := []primitive.ObjectID{clientId, targetId}
 	query := bson.M{"participant": participants}
 	err := collection.FindOne(context.TODO(), query).Decode(&hub)
-	fmt.Println(err)
 	if err == nil {
 		resp := u.Message(false, "Hub already exists")
 		resp["data"] = hub
