@@ -3,7 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
-	"time"
+	"sync"
 
 	"github.com/ellvisca/messenger/models"
 	u "github.com/ellvisca/messenger/utils"
@@ -11,12 +11,16 @@ import (
 )
 
 var CreateHub = func(w http.ResponseWriter, r *http.Request) {
+	// User and target ID
 	userId := r.Context().Value("client").(primitive.ObjectID)
 	keys := r.URL.Query()["targetId"]
 	targetId, _ := primitive.ObjectIDFromHex(keys[0])
 
+	// Create hub
 	hub := &models.Hub{}
 	resp := hub.Create(userId, targetId)
+
+	// Response
 	u.Respond(w, resp)
 }
 
@@ -34,9 +38,15 @@ var ReceiveMsg = func(w http.ResponseWriter, r *http.Request) {
 	keys := r.URL.Query()["hubId"]
 	hubId, _ := primitive.ObjectIDFromHex(keys[0])
 
+	// Goroutine and channel
 	clientMsgs := make(chan *models.Message, 1)
-	go client.SendMsg(userId, message.Text, clientMsgs)
-	time.Sleep(time.Microsecond)
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		client.SendMsg(userId, message.Text, clientMsgs)
+	}()
+	wg.Wait()
 
 	select {
 	case messages := <-clientMsgs:
