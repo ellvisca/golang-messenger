@@ -14,7 +14,6 @@ import (
 
 var JwtAuthentication = func(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		//List of endpoint that doesn't need authentication
 		notAuth := []string{"/", "/api/v1/client", "/api/v1/client/login"}
 
@@ -56,7 +55,7 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 		tk := &models.Token{}
 
 		token, err := jwt.ParseWithClaims(tokenPart, tk, func(token *jwt.Token) (interface{}, error) {
-			return []byte(os.Getenv("token_password")), nil
+			return []byte(os.Getenv("SECRET_KEY")), nil
 		})
 
 		//Malformed token
