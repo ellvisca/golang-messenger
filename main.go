@@ -8,6 +8,7 @@ import (
 	"github.com/ellvisca/messenger/app"
 	"github.com/ellvisca/messenger/controllers"
 	"github.com/gorilla/mux"
+	"github.com/jesseokeya/go-httplogger"
 	"github.com/maple-ai/syrup"
 )
 
@@ -34,7 +35,7 @@ func main() {
 
 	fmt.Println("Listening on port ", port)
 
-	err := http.ListenAndServe(":"+port, router)
+	err := http.ListenAndServe(":"+port, httplogger.Golog(router))
 	if err != nil {
 		fmt.Print(err)
 	}

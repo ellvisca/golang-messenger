@@ -2,11 +2,13 @@ package models
 
 import (
 	"context"
+	"log"
 	"os"
 
 	"github.com/Kamva/mgm"
 	"github.com/dgrijalva/jwt-go"
 	u "github.com/ellvisca/messenger/utils"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -75,12 +77,18 @@ func (client *Client) Create() map[string]interface{} {
 
 // Client login
 func Login(username, password string) map[string]interface{} {
+	// Load .env
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	collection := GetDB().Collection("clients")
 	filter := bson.M{"username": username}
 	client := &Client{}
 
 	// Log in attempt
-	err := collection.FindOne(context.TODO(), filter).Decode(&client)
+	err = collection.FindOne(context.TODO(), filter).Decode(&client)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return u.Message(false, "Username not found")
@@ -98,7 +106,7 @@ func Login(username, password string) map[string]interface{} {
 	// Token
 	tk := &Token{ClientId: client.ID}
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
-	tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
+	tokenString, _ := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
 	client.Token = tokenString
 
 	// Response
