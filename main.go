@@ -7,10 +7,15 @@ import (
 
 	"github.com/ellvisca/messenger/app"
 	"github.com/ellvisca/messenger/controllers"
+	u "github.com/ellvisca/messenger/utils"
 	"github.com/gorilla/mux"
 	"github.com/jesseokeya/go-httplogger"
 	"github.com/maple-ai/syrup"
 )
+
+func Home(w http.ResponseWriter, r *http.Request) {
+	u.Respond(w, u.Message(true, "Welcome to API"))
+}
 
 func main() {
 	router := syrup.New(mux.NewRouter())
@@ -27,6 +32,9 @@ func main() {
 
 	// Middleware
 	router.Use(app.JwtAuthentication)
+
+	// Home
+	router.HandleFunc("/", Home)
 
 	port := os.Getenv("PORT")
 	if port == "" {
