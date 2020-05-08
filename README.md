@@ -6,6 +6,7 @@ This extends to understanding about concurrency in Go.
 In this project, I will be implementing some key features from Go, such as:
 * [Goroutines](https://tour.golang.org/concurrency/1)
 * [Channels](https://tour.golang.org/concurrency/2)
+* [WaitGroups](https://golang.org/pkg/sync/#example_WaitGroup)
 
 ## Built With
 
@@ -19,6 +20,7 @@ In this project, I will be implementing some key features from Go, such as:
 ### Web Toolkit
 * [Gorilla](https://www.gorillatoolkit.org/) - Web Toolkit
 * [Syrup](https://github.com/maple-ai/syrup) - Enhancement for gorilla/mux
+* [go-httplogger](https://github.com/jesseokeya/go-httplogger) - HTTP logger
 * and many more
 
 ## Authors
