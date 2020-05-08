@@ -34,7 +34,7 @@ func main() {
 	router.Use(app.JwtAuthentication)
 
 	// Home
-	router.HandleFunc("/", Home)
+	router.Get("/", Home)
 
 	port := os.Getenv("PORT")
 	if port == "" {
