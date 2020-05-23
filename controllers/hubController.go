@@ -46,7 +46,7 @@ var ReceiveMsg = func(w http.ResponseWriter, r *http.Request) {
 		defer wg.Done()
 		client.SendMsg(userId, message.Text, clientMsgs)
 	}()
-	wg.Wait()
+	wg.Wait() //only call when value needed
 
 	select {
 	case messages := <-clientMsgs:

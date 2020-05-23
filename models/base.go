@@ -15,10 +15,7 @@ var db *mongo.Database
 
 func init() {
 	// Load .env
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	godotenv.Load()
 
 	// Connect to MongoDB
 	clientOptions := options.Client().ApplyURI(os.Getenv("CONNECTIONSTRING"))
