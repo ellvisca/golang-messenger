@@ -29,8 +29,6 @@ RUN cp /build/main .
 # Build a small image
 FROM scratch
 
-ENV CONNECTIONSTRING=mongodb://mongo-0.mongo,mongo-1.mongo,mongo-2.mongo:27017/dbname_?
-
 COPY --from=builder /dist/main /
 
 # Command to run
