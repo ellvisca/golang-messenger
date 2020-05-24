@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,7 +17,7 @@ func init() {
 	godotenv.Load()
 
 	// Connect to MongoDB
-	clientOptions := options.Client().ApplyURI(os.Getenv("CONNECTIONSTRING"))
+	clientOptions := options.Client().ApplyURI("mongodb://mongo-0.mongo,mongo-1.mongo,mongo-2.mongo:27017/dbname_?")
 
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
