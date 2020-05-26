@@ -17,7 +17,7 @@ func init() {
 	godotenv.Load()
 
 	// Connect to MongoDB
-	clientOptions := options.Client().ApplyURI("mongodb://mongo-0.mongo,mongo-1.mongo,mongo-2.mongo:27017/")
+	clientOptions := options.Client().ApplyURI("mongodb://mongo.default.svc.cluster.local/admin?replicaSet=mongo")
 
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
